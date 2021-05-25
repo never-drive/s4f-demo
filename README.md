@@ -2,6 +2,8 @@
 
 A vanilla JS app, which can easily be deployed to Heroku.
 
+This code's origin is [Sudoku JS](https://codepen.io/Mobius1/pen/EmJEoJ) by Karl Saunders.
+
 This project was bootstrapped according to [this article](https://medium.com/@winnieliang/how-to-run-a-simple-html-css-javascript-application-on-heroku-4e664c541b0b) by Winnie Liang
 
 ## Deploying to Heroku
