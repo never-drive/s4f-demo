@@ -11,6 +11,7 @@ This project was bootstrapped according to [this article](https://medium.com/@wi
 Install the [Heroku CLI](https://cli.heroku.com/).
 
 ```sh
+$ heroku create
 $ git push heroku master
 $ heroku open
 ```
