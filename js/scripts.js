@@ -86,37 +86,8 @@
 
             for (var i = 0; i < 9; i++) {
                 tr = document.createElement("tr");
-                var rowData = {};
 
-                for (var j = 0; j < 9; j++) {
-                    // Build the input
-                    rowData[j] = document.createElement("input");
-                    rowData[j].maxLength = 1;
-
-                    // Using dataset returns strings which means messing around parsing them later
-                    // Set custom properties instead
-                    rowData[j].row = i;
-                    rowData[j].col = j;
-
-                    rowData[j].addEventListener("keyup", this.onKeyUp.bind(this));
-
-                    td = document.createElement("td");
-
-                    td.appendChild(rowData[j]);
-
-                    // Calculate section ID
-                    var sectIDi = Math.floor(i / 3);
-                    var sectIDj = Math.floor(j / 3);
-                    // Set the design for different sections
-                    if ((sectIDi + sectIDj) % 2 === 0) {
-                        td.classList.add("sudoku-section-one");
-                    } else {
-                        td.classList.add("sudoku-section-two");
-                    }
-                    // Build the row
-                    tr.appendChild(td);
-                }
-                this.cellMatrix[i] = rowData;
+                this.cellMatrix[i] = this.createRow(tr, i);
 
                 // Append to table
                 this.table.appendChild(tr);
@@ -126,6 +97,40 @@
 
             // Return the GUI table
             return this.table;
+        },
+
+        createRow: function (tr, i) {
+            var rowData = {};
+
+            for (var j = 0; j < 9; j++) {
+                // Build the input
+                rowData[j] = document.createElement("input");
+                rowData[j].maxLength = 1;
+
+                // Using dataset returns strings which means messing around parsing them later
+                // Set custom properties instead
+                rowData[j].row = i;
+                rowData[j].col = j;
+
+                rowData[j].addEventListener("keyup", this.onKeyUp.bind(this));
+
+                var td = document.createElement("td");
+
+                td.appendChild(rowData[j]);
+
+                // Calculate section ID
+                var sectIDi = Math.floor(i / 3);
+                var sectIDj = Math.floor(j / 3);
+                // Set the design for different sections
+                if ((sectIDi + sectIDj) % 2 === 0) {
+                    td.classList.add("sudoku-section-one");
+                } else {
+                    td.classList.add("sudoku-section-two");
+                }
+                // Build the row
+                tr.appendChild(td);
+            }
+            return rowData;
         },
 
         /**
