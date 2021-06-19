@@ -60,6 +60,8 @@
 
         // Initialize game parameters
         this.cellMatrix = {};
+        this.selectedCell = {};
+        this.inputValues = {};
         this.matrix = {};
         this.validation = {};
 
@@ -96,7 +98,7 @@
             for (var i = 0; i < 9; i++) {
                 var tr = document.createElement("tr");
 
-                this.cellMatrix[i] = this.createRow(tr, i);
+                this.cellMatrix[i] = this.createRow(tr, i, false);
 
                 // Append to table
                 this.table.appendChild(tr);
@@ -113,7 +115,7 @@
             table.classList.add("sudoku-container");
 
             var tr = document.createElement("tr");
-            this.createRow(tr, 0);
+            this.inputValues = this.createRow(tr, 0, true);
             table.appendChild(tr);
 
             table.addEventListener("mousedown", this.onMouseDown.bind(this));
@@ -121,24 +123,24 @@
             return table;
         },
 
-        createRow: function (tr, i) {
+        createRow: function (tr, i, isInputValue) {
             var rowData = {};
 
             for (var j = 0; j < 9; j++) {
                 // Build the input
-                rowData[j] = document.createElement("input");
-                rowData[j].maxLength = 1;
+                var cell = document.createElement("input");
+                cell.setAttribute("type", "buttn");
+                cell.maxLength = 1;
 
-                // Using dataset returns strings which means messing around parsing them later
                 // Set custom properties instead
-                rowData[j].row = i;
-                rowData[j].col = j;
-
-                rowData[j].addEventListener("keyup", this.onKeyUp.bind(this));
+                cell.row = i;
+                cell.col = j;
+                cell.isInputValue = isInputValue;
 
                 var td = document.createElement("td");
 
-                td.appendChild(rowData[j]);
+                td.appendChild(cell);
+                rowData[j] = cell;
 
                 // Calculate section ID
                 var sectIDi = Math.floor(i / 3);
@@ -155,18 +157,13 @@
             return rowData;
         },
 
-        /**
-         * Handle keyup events.
-         *
-         * @param {Event} e Keyup event
-         */
-        onKeyUp: function (e) {
+        selectValue: function (inputValue) {
             var sectRow,
                 sectCol,
                 secIndex,
                 val, row, col,
                 isValid = true,
-                input = e.currentTarget
+                input = inputValue
 
             val = input.value.trim();
             row = input.row;
@@ -204,6 +201,49 @@
 
             if (t.nodeName === "INPUT" && t.classList.contains("disabled")) {
                 e.preventDefault();
+            }
+            else if (t.nodeName === "INPUT") {
+                var cell = t;
+                if (cell.isInputValue) {
+                    // click from input row -> write selected value back to cell
+                    this.selectedCell.value = cell.value;
+                    this.selectValue(this.selectedCell);
+                } else {
+                    // click from cell matrix -> prepare input
+                    this.selectedCell = cell;
+                    this.setAvaliableInputValues(cell);
+                }
+            }
+        },
+
+        setAvaliableInputValues: function (cell) {
+            for (var i = 0; i < 9; i++) {
+                this.inputValues[i].value = i + 1;
+            }
+            var row = cell.row;
+            var col = cell.col;
+            for (var i = 0; i < 9; i++) {
+                var rowCell = this.cellMatrix[row][i];
+                var rowValue = rowCell.value;
+                if (util.isNumber(rowValue)) {
+                    this.inputValues[rowValue - 1].value = '';
+                }
+                var colCell = this.cellMatrix[i][col];
+                var colValue = colCell.value;
+                if (util.isNumber(colValue)) {
+                    this.inputValues[colValue - 1].value = '';
+                }
+            }
+            var startRow = 3 * Math.floor(row / 3);
+            var startCol = 3 * Math.floor(col / 3);
+            for (var i = startRow; i < startRow + 3; i++) {
+                for (var j = startCol; j < startCol + 3; j++) {
+                    var colCell = this.cellMatrix[i][j];
+                    var colValue = colCell.value;
+                    if (util.isNumber(colValue)) {
+                        this.inputValues[colValue - 1].value = '';
+                    }
+                }
             }
         },
 
