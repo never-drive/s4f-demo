@@ -86,23 +86,23 @@
 
             for (var i = 0; i < 9; i++) {
                 tr = document.createElement("tr");
-                this.cellMatrix[i] = {};
+                var rowData = {};
 
                 for (var j = 0; j < 9; j++) {
                     // Build the input
-                    this.cellMatrix[i][j] = document.createElement("input");
-                    this.cellMatrix[i][j].maxLength = 1;
+                    rowData[j] = document.createElement("input");
+                    rowData[j].maxLength = 1;
 
                     // Using dataset returns strings which means messing around parsing them later
                     // Set custom properties instead
-                    this.cellMatrix[i][j].row = i;
-                    this.cellMatrix[i][j].col = j;
+                    rowData[j].row = i;
+                    rowData[j].col = j;
 
-                    this.cellMatrix[i][j].addEventListener("keyup", this.onKeyUp.bind(this));
+                    rowData[j].addEventListener("keyup", this.onKeyUp.bind(this));
 
                     td = document.createElement("td");
 
-                    td.appendChild(this.cellMatrix[i][j]);
+                    td.appendChild(rowData[j]);
 
                     // Calculate section ID
                     var sectIDi = Math.floor(i / 3);
@@ -116,6 +116,8 @@
                     // Build the row
                     tr.appendChild(td);
                 }
+                this.cellMatrix[i] = rowData;
+
                 // Append to table
                 this.table.appendChild(tr);
             }
