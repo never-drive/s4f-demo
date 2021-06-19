@@ -129,7 +129,7 @@
             for (var j = 0; j < 9; j++) {
                 // Build the input
                 var cell = document.createElement("input");
-                cell.setAttribute("type", "buttn");
+                cell.setAttribute("type", "button");
                 cell.maxLength = 1;
 
                 // Set custom properties instead
