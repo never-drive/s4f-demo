@@ -79,13 +79,18 @@
          * @returns {HTMLTableElement} Table containing 9x9 input matrix
          */
         buildGUI: function () {
-            var td, tr;
+            var grid = this.createGrid();
+            var div = document.createElement("div");
+            div.appendChild(grid);
+            return div;
+        },
 
+        createGrid: function () {
             this.table = document.createElement("table");
             this.table.classList.add("sudoku-container");
 
             for (var i = 0; i < 9; i++) {
-                tr = document.createElement("tr");
+                var tr = document.createElement("tr");
 
                 this.cellMatrix[i] = this.createRow(tr, i);
 
