@@ -80,8 +80,12 @@
          */
         buildGUI: function () {
             var grid = this.createGrid();
+            var br = document.createElement("br");
+            var input = this.createInput();
             var div = document.createElement("div");
             div.appendChild(grid);
+            div.appendChild(br);
+            div.appendChild(input);
             return div;
         },
 
@@ -102,6 +106,19 @@
 
             // Return the GUI table
             return this.table;
+        },
+
+        createInput: function () {
+            var table = document.createElement("table");
+            table.classList.add("sudoku-container");
+
+            var tr = document.createElement("tr");
+            this.createRow(tr, 0);
+            table.appendChild(tr);
+
+            table.addEventListener("mousedown", this.onMouseDown.bind(this));
+
+            return table;
         },
 
         createRow: function (tr, i) {
