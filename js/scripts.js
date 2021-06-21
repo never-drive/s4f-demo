@@ -60,6 +60,8 @@
 
         // Initialize game parameters
         this.cellMatrix = {};
+        this.selectedCell = {};
+        this.inputValues = {};
         this.matrix = {};
         this.validation = {};
 
@@ -79,43 +81,25 @@
          * @returns {HTMLTableElement} Table containing 9x9 input matrix
          */
         buildGUI: function () {
-            var td, tr;
+            var grid = this.createGrid();
+            var br = document.createElement("br");
+            var input = this.createInput();
+            var div = document.createElement("div");
+            div.appendChild(grid);
+            div.appendChild(br);
+            div.appendChild(input);
+            return div;
+        },
 
+        createGrid: function () {
             this.table = document.createElement("table");
             this.table.classList.add("sudoku-container");
 
             for (var i = 0; i < 9; i++) {
-                tr = document.createElement("tr");
-                this.cellMatrix[i] = {};
+                var tr = document.createElement("tr");
 
-                for (var j = 0; j < 9; j++) {
-                    // Build the input
-                    this.cellMatrix[i][j] = document.createElement("input");
-                    this.cellMatrix[i][j].maxLength = 1;
+                this.cellMatrix[i] = this.createRow(tr, i, false);
 
-                    // Using dataset returns strings which means messing around parsing them later
-                    // Set custom properties instead
-                    this.cellMatrix[i][j].row = i;
-                    this.cellMatrix[i][j].col = j;
-
-                    this.cellMatrix[i][j].addEventListener("keyup", this.onKeyUp.bind(this));
-
-                    td = document.createElement("td");
-
-                    td.appendChild(this.cellMatrix[i][j]);
-
-                    // Calculate section ID
-                    var sectIDi = Math.floor(i / 3);
-                    var sectIDj = Math.floor(j / 3);
-                    // Set the design for different sections
-                    if ((sectIDi + sectIDj) % 2 === 0) {
-                        td.classList.add("sudoku-section-one");
-                    } else {
-                        td.classList.add("sudoku-section-two");
-                    }
-                    // Build the row
-                    tr.appendChild(td);
-                }
                 // Append to table
                 this.table.appendChild(tr);
             }
@@ -126,18 +110,60 @@
             return this.table;
         },
 
-        /**
-         * Handle keyup events.
-         *
-         * @param {Event} e Keyup event
-         */
-        onKeyUp: function (e) {
+        createInput: function () {
+            var table = document.createElement("table");
+            table.classList.add("sudoku-container");
+
+            var tr = document.createElement("tr");
+            this.inputValues = this.createRow(tr, 0, true);
+            table.appendChild(tr);
+
+            table.addEventListener("mousedown", this.onMouseDown.bind(this));
+
+            return table;
+        },
+
+        createRow: function (tr, i, isInputValue) {
+            var rowData = {};
+
+            for (var j = 0; j < 9; j++) {
+                // Build the input
+                var cell = document.createElement("input");
+                cell.setAttribute("type", "button");
+                cell.maxLength = 1;
+
+                // Set custom properties instead
+                cell.row = i;
+                cell.col = j;
+                cell.isInputValue = isInputValue;
+
+                var td = document.createElement("td");
+
+                td.appendChild(cell);
+                rowData[j] = cell;
+
+                // Calculate section ID
+                var sectIDi = Math.floor(i / 3);
+                var sectIDj = Math.floor(j / 3);
+                // Set the design for different sections
+                if ((sectIDi + sectIDj) % 2 === 0) {
+                    td.classList.add("sudoku-section-one");
+                } else {
+                    td.classList.add("sudoku-section-two");
+                }
+                // Build the row
+                tr.appendChild(td);
+            }
+            return rowData;
+        },
+
+        selectValue: function (inputValue) {
             var sectRow,
                 sectCol,
                 secIndex,
                 val, row, col,
                 isValid = true,
-                input = e.currentTarget
+                input = inputValue
 
             val = input.value.trim();
             row = input.row;
@@ -175,6 +201,46 @@
 
             if (t.nodeName === "INPUT" && t.classList.contains("disabled")) {
                 e.preventDefault();
+            }
+            else if (t.nodeName === "INPUT") {
+                var cell = t;
+                if (cell.isInputValue) {
+                    // click from input row -> write selected value back to cell
+                    this.selectedCell.value = cell.value;
+                    this.selectValue(this.selectedCell);
+                } else {
+                    // click from cell matrix -> prepare input
+                    this.selectedCell = cell;
+                    this.setAvaliableInputValues(cell);
+                }
+            }
+        },
+
+        setAvaliableInputValues: function (cell) {
+            for (var i = 0; i < 9; i++) {
+                this.inputValues[i].value = i + 1;
+            }
+            var row = cell.row;
+            var col = cell.col;
+            for (var i = 0; i < 9; i++) {
+                var rowCell = this.cellMatrix[row][i];
+                this.resetInputValue(rowCell.value);
+                var colCell = this.cellMatrix[i][col];
+                this.resetInputValue(colCell.value);
+            }
+            var startRow = 3 * Math.floor(row / 3);
+            var startCol = 3 * Math.floor(col / 3);
+            for (var i = startRow; i < startRow + 3; i++) {
+                for (var j = startCol; j < startCol + 3; j++) {
+                    var blockCell = this.cellMatrix[i][j];
+                    this.resetInputValue(blockCell.value);
+                }
+            }
+        },
+
+        resetInputValue: function (value) {
+            if (util.isNumber(value) && value > 0 && value <= 9) {
+                this.inputValues[value - 1].value = '';
             }
         },
 
