@@ -224,26 +224,23 @@
             var col = cell.col;
             for (var i = 0; i < 9; i++) {
                 var rowCell = this.cellMatrix[row][i];
-                var rowValue = rowCell.value;
-                if (util.isNumber(rowValue)) {
-                    this.inputValues[rowValue - 1].value = '';
-                }
+                this.resetInputValue(rowCell.value);
                 var colCell = this.cellMatrix[i][col];
-                var colValue = colCell.value;
-                if (util.isNumber(colValue)) {
-                    this.inputValues[colValue - 1].value = '';
-                }
+                this.resetInputValue(colCell.value);
             }
             var startRow = 3 * Math.floor(row / 3);
             var startCol = 3 * Math.floor(col / 3);
             for (var i = startRow; i < startRow + 3; i++) {
                 for (var j = startCol; j < startCol + 3; j++) {
-                    var colCell = this.cellMatrix[i][j];
-                    var colValue = colCell.value;
-                    if (util.isNumber(colValue)) {
-                        this.inputValues[colValue - 1].value = '';
-                    }
+                    var blockCell = this.cellMatrix[i][j];
+                    this.resetInputValue(blockCell.value);
                 }
+            }
+        },
+
+        resetInputValue: function (value) {
+            if (util.isNumber(value) && value > 0 && value <= 9) {
+                this.inputValues[value - 1].value = '';
             }
         },
 
